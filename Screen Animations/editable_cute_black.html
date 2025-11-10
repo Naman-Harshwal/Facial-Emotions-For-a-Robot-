@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customizable Animated Face</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000; /* Changed to black */
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+        .face-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        canvas {
+            width: 90vmin;
+            height: 90vmin;
+            max-width: 800px;
+            max-height: 800px;
+        }
+        .controls {
+            position: absolute;
+            bottom: 1vh;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: rgba(40, 40, 40, 0.8); /* Darker controls for contrast */
+            border-top: 1px solid #333;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 10px;
+            background-color: #3a3a3a;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .control-group h4 {
+            margin: 0 0 5px 0;
+            font-weight: 600;
+            color: #f0f0f0; /* Light text for dark background */
+        }
+        .button-row {
+            display: flex;
+            gap: 5px;
+        }
+        .pos-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
+        }
+        .controls button {
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #f0f0f0;
+            background-color: #505050;
+            border: 1px solid #666;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .controls button.emotion-btn {
+            width: auto;
+            padding: 0 10px;
+            font-size: 14px;
+        }
+        .controls button:hover { background-color: #6a6a6a; }
+        .controls button:active { transform: translateY(1px); }
+        .placeholder { width: 30px; height: 30px; }
+    </style>
+</head>
+<body>
+    <div class="face-container">
+        <canvas id="faceCanvas"></canvas>
+        <div class="controls">
+            <!-- Emotion Controls -->
+            <div class="control-group">
+                <h4>Emotions</h4>
+                <div class="button-row">
+                    <button class="emotion-btn" id="happy-btn">Happy</button>
+                    <button class="emotion-btn" id="sad-btn">Sad</button>
+                    <button class="emotion-btn" id="angry-btn">Angry</button>
+                    <button class="emotion-btn" id="surprised-btn">Surprised</button>
+                    <button class="emotion-btn" id="fear-btn">Fear</button>
+                    <button class="emotion-btn" id="disgust-btn">Disgust</button>
+                    <button class="emotion-btn" id="thinking-btn">Thinking</button>
+                    <button class="emotion-btn" id="neutral-btn">Neutral</button>
+                </div>
+            </div>
+            <!-- Eyes Controls -->
+            <div class="control-group">
+                <h4>Eyes & Brows</h4>
+                <div class="button-row">
+                    <div class="pos-grid">
+                        <div class="placeholder"></div><button id="eyes-up">↑</button><div class="placeholder"></div>
+                        <button id="eyes-left">←</button><div class="placeholder"></div><button id="eyes-right">→</button>
+                        <div class="placeholder"></div><button id="eyes-down">↓</button><div class="placeholder"></div>
+                    </div>
+                    <div class="pos-grid">
+                        <button id="spacing-dec">→←</button><button id="eyes-size-inc">+</button><button id="spacing-inc">↔</button>
+                        <div class="placeholder"></div><div class="placeholder"></div><div class="placeholder"></div>
+                        <div class="placeholder"></div><button id="eyes-size-dec">-</button><div class="placeholder"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Nose Controls -->
+            <div class="control-group">
+                <h4>Nose</h4>
+                 <div class="button-row">
+                    <div class="pos-grid">
+                        <div class="placeholder"></div><button id="nose-up">↑</button><div class="placeholder"></div>
+                        <button id="nose-left">←</button><div class="placeholder"></div><button id="nose-right">→</button>
+                        <div class="placeholder"></div><button id="nose-down">↓</button><div class="placeholder"></div>
+                    </div>
+                    <div class="pos-grid">
+                        <div class="placeholder"></div><button id="nose-size-inc">+</button><div class="placeholder"></div>
+                        <div class="placeholder"></div><div class="placeholder"></div><div class="placeholder"></div>
+                        <div class="placeholder"></div><button id="nose-size-dec">-</button><div class="placeholder"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Mouth Controls -->
+             <div class="control-group">
+                <h4>Mouth</h4>
+                 <div class="button-row">
+                    <div class="pos-grid">
+                        <div class="placeholder"></div><button id="mouth-up">↑</button><div class="placeholder"></div>
+                        <button id="mouth-left">←</button><div class="placeholder"></div><button id="mouth-right">→</button>
+                        <div class="placeholder"></div><button id="mouth-down">↓</button><div class="placeholder"></div>
+                    </div>
+                    <div class="pos-grid">
+                        <div class="placeholder"></div><button id="mouth-size-inc">+</button><div class="placeholder"></div>
+                        <div class="placeholder"></div><div class="placeholder"></div><div class="placeholder"></div>
+                        <div class="placeholder"></div><button id="mouth-size-dec">-</button><div class="placeholder"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('faceCanvas');
+            const ctx = canvas.getContext('2d');
+
+            const baseWidth = 600;
+            const baseHeight = 450;
+            canvas.width = baseWidth;
+            canvas.height = baseHeight;
+
+            const colors = {
+                line: '#FFFFFF', // Changed to white
+                irisDeep: '#5DADE2', // Light blue shades
+                irisMid: '#85C1E9',
+                irisLight: '#AED6F1',
+                highlight: '#FFFFFF',
+                mouthLine: '#d37a8a',
+                mouthFill: '#f5c5d0',
+                nose: 'rgba(200, 200, 200, 0.5)' // Lighter nose for dark background
+            };
+            
+            // --- State Management for Animation ---
+            let state = {
+                emotion: 'neutral',
+                iris: { x: 0, y: 0, targetX: 0, targetY: 0 },
+                features: {
+                    eyes: { x: 0, y: 0, scale: 1.0, spacing: 100 },
+                    nose: { x: 0, y: 0, scale: 1.0 },
+                    mouth: { x: 0, y: 0, scale: 1.0 }
+                },
+                eyebrows: {
+                    left: { y: 0, rot: 0, targetY: 0, targetRot: 0 },
+                    right: { y: 0, rot: 0, targetY: 0, targetRot: 0 }
+                },
+                eyes: {
+                    left: { y: 0, scaleY: 1, targetY: 0, targetScaleY: 1 },
+                    right: { y: 0, scaleY: 1, targetY: 0, targetScaleY: 1 }
+                },
+                mouth: {
+                    y: 0, targetY: 0,
+                    curve: 222, targetCurve: 222,
+                    lipHeight: 7, targetLipHeight: 7,
+                    opacity: 0.5, targetOpacity: 0.5
+                },
+                blink: { isBlinking: false, progress: 0 }
+            };
+
+            // --- Animation Engine ---
+            function lerp(start, end, amount) {
+                return start * (1 - amount) + end * amount;
+            }
+
+            function mainLoop() {
+                const lerpAmount = 0.1;
+                state.iris.x = lerp(state.iris.x, state.iris.targetX, lerpAmount);
+                state.iris.y = lerp(state.iris.y, state.iris.targetY, lerpAmount);
+                
+                state.eyebrows.left.y = lerp(state.eyebrows.left.y, state.eyebrows.left.targetY, lerpAmount);
+                state.eyebrows.left.rot = lerp(state.eyebrows.left.rot, state.eyebrows.left.targetRot, lerpAmount);
+                state.eyebrows.right.y = lerp(state.eyebrows.right.y, state.eyebrows.right.targetY, lerpAmount);
+                state.eyebrows.right.rot = lerp(state.eyebrows.right.rot, state.eyebrows.right.targetRot, lerpAmount);
+
+                state.eyes.left.scaleY = lerp(state.eyes.left.scaleY, state.eyes.left.targetScaleY, lerpAmount);
+                state.eyes.right.scaleY = lerp(state.eyes.right.scaleY, state.eyes.right.targetScaleY, lerpAmount);
+                state.eyes.left.y = lerp(state.eyes.left.y, state.eyes.left.targetY, lerpAmount);
+                state.eyes.right.y = lerp(state.eyes.right.y, state.eyes.right.targetY, lerpAmount);
+
+                state.mouth.y = lerp(state.mouth.y, state.mouth.targetY, lerpAmount);
+                state.mouth.curve = lerp(state.mouth.curve, state.mouth.targetCurve, lerpAmount);
+                state.mouth.lipHeight = lerp(state.mouth.lipHeight, state.mouth.targetLipHeight, lerpAmount);
+                state.mouth.opacity = lerp(state.mouth.opacity, state.mouth.targetOpacity, lerpAmount);
+
+                if (state.blink.isBlinking) {
+                    state.blink.progress += 0.2;
+                    if (state.blink.progress >= 2) {
+                        state.blink.isBlinking = false;
+                        state.blink.progress = 0;
+                    }
+                }
+
+                drawFace();
+                requestAnimationFrame(mainLoop);
+            }
+
+            // --- Drawing Functions ---
+            function drawFace() {
+                ctx.save();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.translate(canvas.width / 2 - 200, canvas.height / 2 - 150);
+
+                if (state.emotion === 'angry') {
+                    ctx.translate((Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5);
+                }
+                
+                const centerX = 200;
+                const eyeSpacing = state.features.eyes.spacing;
+
+                drawEyebrows(centerX, eyeSpacing);
+                drawEye(centerX - eyeSpacing, 140, false);
+                drawEye(centerX + eyeSpacing, 140, true);
+                drawNose();
+                drawMouth();
+                ctx.restore();
+            }
+
+            function drawEyebrows(centerX, spacing) {
+                const { x, y, scale } = state.features.eyes;
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.strokeStyle = colors.line;
+                ctx.lineWidth = 4 * scale;
+                ctx.lineCap = 'round';
+                
+                // Left
+                ctx.save();
+                ctx.translate(centerX - spacing, 95);
+                ctx.scale(scale, scale);
+                ctx.translate(0, state.eyebrows.left.y);
+                ctx.rotate(state.eyebrows.left.rot * Math.PI / 180);
+                ctx.beginPath(); ctx.moveTo(-40, 5); ctx.bezierCurveTo(-20, -10, 30, -5, 40, 10); ctx.stroke();
+                ctx.restore();
+
+                // Right
+                ctx.save();
+                ctx.translate(centerX + spacing, 95);
+                ctx.scale(scale, scale);
+                ctx.translate(0, state.eyebrows.right.y);
+                ctx.rotate(state.eyebrows.right.rot * Math.PI / 180);
+                ctx.beginPath(); ctx.moveTo(-40, 10); ctx.bezierCurveTo(-30, -5, 20, -10, 40, 5); ctx.stroke();
+                ctx.restore();
+                ctx.restore();
+            }
+
+            function drawEye(x, y, isFlipped) {
+                const { x: offsetX, y: offsetY, scale } = state.features.eyes;
+                const eyeState = isFlipped ? state.eyes.right : state.eyes.left;
+                
+                ctx.save();
+                ctx.translate(offsetX, offsetY);
+                ctx.translate(x, y);
+                ctx.scale(scale, scale);
+                ctx.translate(0, eyeState.y);
+                ctx.scale(1, eyeState.scaleY);
+                ctx.translate(-x, -y);
+
+                // Clipping path
+                ctx.beginPath();
+                ctx.moveTo(x - 50, y); ctx.bezierCurveTo(x - 40, y - 30, x + 40, y - 30, x + 50, y);
+                ctx.bezierCurveTo(x + 40, y + 30, x - 40, y + 30, x - 50, y);
+                ctx.closePath();
+                ctx.save();
+                ctx.clip();
+
+                // Iris
+                ctx.translate(state.iris.x, state.iris.y);
+                const gradient = ctx.createLinearGradient(x, y - 50, x, y + 50);
+                gradient.addColorStop(0, colors.irisMid); gradient.addColorStop(0.3, colors.irisDeep);
+                gradient.addColorStop(0.7, colors.irisMid); gradient.addColorStop(1, colors.irisLight);
+                ctx.fillStyle = gradient;
+                ctx.beginPath(); ctx.ellipse(x, y, 48, 52, 0, 0, 2 * Math.PI); ctx.fill();
+                ctx.fillStyle = colors.irisDeep; ctx.globalAlpha = 0.2; ctx.fill(); ctx.globalAlpha = 1.0;
+                ctx.fillStyle = colors.highlight; ctx.globalAlpha = 0.95;
+                ctx.beginPath(); ctx.ellipse(isFlipped ? x + 15 : x - 15, y - 15, 15, 20, 0, 0, 2 * Math.PI); ctx.fill();
+                ctx.globalAlpha = 0.85;
+                ctx.beginPath(); ctx.ellipse(isFlipped ? x - 20 : x + 20, y + 20, 6, 8, 0, 0, 2 * Math.PI); ctx.fill();
+                ctx.globalAlpha = 1.0;
+                ctx.restore(); // remove clip
+
+                // Eyelashes
+                ctx.fillStyle = colors.line; ctx.strokeStyle = colors.line; ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(x - 50, y); ctx.bezierCurveTo(x - 40, y - 30, x + 40, y - 30, x + 50, y);
+                ctx.bezierCurveTo(x + 45, y + 2, x + 20, y - 15, x, y - 15);
+                ctx.bezierCurveTo(x - 20, y - 15, x - 45, y + 2, x - 50, y);
+                ctx.closePath(); ctx.fill();
+                
+                if (!isFlipped) {
+                    ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x - 48, y - 2); ctx.quadraticCurveTo(x - 60, y - 15, x - 60, y - 30); ctx.stroke();
+                    ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(x - 38, y - 20); ctx.quadraticCurveTo(x - 50, y - 35, x - 45, y - 50); ctx.stroke();
+                    ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x - 45, y + 5); ctx.quadraticCurveTo(x - 50, y + 15, x - 48, y + 18); ctx.stroke();
+                } else {
+                    ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x + 48, y - 2); ctx.quadraticCurveTo(x + 60, y - 15, x + 60, y - 30); ctx.stroke();
+                    ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(x + 38, y - 20); ctx.quadraticCurveTo(x + 50, y - 35, x + 45, y - 50); ctx.stroke();
+                    ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 45, y + 5); ctx.quadraticCurveTo(x + 50, y + 15, x + 48, y + 18); ctx.stroke();
+                }
+
+                if (state.blink.isBlinking) {
+                    const blinkY = Math.sin(state.blink.progress * Math.PI / 2) * 70;
+                    ctx.fillStyle = '#000000'; // Eyelid is now black
+                    ctx.beginPath(); ctx.rect(x - 55, y - 40, 110, blinkY); ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            function drawNose() {
+                const { x, y, scale } = state.features.nose;
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.strokeStyle = colors.nose;
+                ctx.lineWidth = 2 * scale;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(200, 185 - (5 * scale));
+                ctx.lineTo(200, 185 + (5 * scale));
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            function drawMouth() {
+                const { x, y, scale } = state.features.mouth;
+                const centerX = 200;
+                const baseY = 220; 
+
+                const newCurveY = baseY + (state.mouth.curve - baseY) * scale;
+                const newLipHeight = state.mouth.lipHeight * scale;
+
+                ctx.save();
+                ctx.translate(x, y);
+                
+                ctx.fillStyle = colors.mouthFill; ctx.globalAlpha = state.mouth.opacity;
+                ctx.beginPath();
+                ctx.moveTo(centerX - (8 * scale), 221);
+                ctx.bezierCurveTo(centerX - (5 * scale), 221 + newLipHeight, centerX + (5 * scale), 221 + newLipHeight, centerX + (8 * scale), 221);
+                ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1.0;
+                
+                ctx.strokeStyle = colors.mouthLine; ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(centerX - (10 * scale), baseY);
+                ctx.bezierCurveTo(centerX - (5 * scale), newCurveY, centerX + (5 * scale), newCurveY, centerX + (10 * scale), baseY);
+                ctx.stroke();
+                
+                ctx.fillStyle = colors.highlight; ctx.globalAlpha = 0.8;
+                ctx.beginPath();
+                ctx.arc(centerX, 221 + (4 * scale), 1 * scale, 0, 2 * Math.PI);
+                ctx.fill(); ctx.globalAlpha = 1.0;
+                
+                ctx.restore();
+            }
+
+            // --- Control Logic ---
+            function setEmotion(emotion) {
+                state.emotion = emotion;
+                const s = { 
+                    eyebrows: { left: { y: 0, rot: 0 }, right: { y: 0, rot: 0 } },
+                    eyes: { left: { y: 0, scaleY: 1 }, right: { y: 0, scaleY: 1 } },
+                    mouth: { y: 0, curve: 222, lipHeight: 7, opacity: 0.5 }
+                };
+
+                switch(emotion) {
+                    case 'happy':
+                        s.eyebrows.left = { y: 2, rot: -3 }; s.eyebrows.right = { y: 2, rot: 3 };
+                        s.eyes.left = { y: -2, scaleY: 0.92 }; s.eyes.right = { y: -2, scaleY: 0.92 };
+                        s.mouth = { y: 0, curve: 232, lipHeight: 7, opacity: 1 };
+                        break;
+                    case 'sad':
+                        s.eyebrows.left = { y: 4, rot: 5 }; s.eyebrows.right = { y: 4, rot: -5 };
+                        s.eyes.left = { y: 3, scaleY: 0.95 }; s.eyes.right = { y: 3, scaleY: 0.95 };
+                        s.mouth = { y: 4, curve: 226, lipHeight: 2, opacity: 0.5 };
+                        break;
+                    case 'surprised':
+                        s.eyebrows.left = { y: -12, rot: 0 }; s.eyebrows.right = { y: -12, rot: 0 };
+                        s.eyes.left = { y: 0, scaleY: 1.05 }; s.eyes.right = { y: 0, scaleY: 1.05 };
+                        s.mouth = { y: 0, curve: 220, lipHeight: 0, opacity: 0 };
+                        break;
+                    case 'angry':
+                        s.eyebrows.left = { y: -4, rot: 15 }; s.eyebrows.right = { y: -4, rot: -15 };
+                        s.eyes.left = { y: 2, scaleY: 0.90 }; s.eyes.right = { y: 2, scaleY: 0.90 };
+                        s.mouth = { y: 2, curve: 225, lipHeight: 0, opacity: 0 };
+                        break;
+                    case 'fear':
+                        s.eyebrows.left = { y: -10, rot: 8 }; s.eyebrows.right = { y: -10, rot: -8 };
+                        s.eyes.left = { y: 0, scaleY: 1.08 }; s.eyes.right = { y: 0, scaleY: 1.08 };
+                        s.mouth = { y: 5, curve: 220, lipHeight: 2, opacity: 0 };
+                        break;
+                    case 'disgust':
+                        s.eyebrows.left = { y: 4, rot: -5 }; s.eyebrows.right = { y: 2, rot: 10 };
+                        s.eyes.left = { y: 0, scaleY: 0.95 }; s.eyes.right = { y: 0, scaleY: 1 };
+                        s.mouth = { y: 5, curve: 215, lipHeight: 0, opacity: 0 };
+                        break;
+                    case 'thinking':
+                        s.eyebrows.left = { y: 0, rot: 0 }; s.eyebrows.right = { y: -8, rot: 5 };
+                        s.mouth = { y: 0, curve: 218, lipHeight: 2, opacity: 0.5 };
+                        state.iris.targetX = 10; state.iris.targetY = -10;
+                        break;
+                }
+                
+                state.eyebrows.left.targetY = s.eyebrows.left.y; state.eyebrows.left.targetRot = s.eyebrows.left.rot;
+                state.eyebrows.right.targetY = s.eyebrows.right.y; state.eyebrows.right.targetRot = s.eyebrows.right.rot;
+                state.eyes.left.targetY = s.eyes.left.y; state.eyes.left.targetScaleY = s.eyes.left.scaleY;
+                state.eyes.right.targetY = s.eyes.right.y; state.eyes.right.targetScaleY = s.eyes.right.scaleY;
+                state.mouth.targetY = s.mouth.y; state.mouth.targetCurve = s.mouth.curve;
+                state.mouth.targetLipHeight = s.mouth.lipHeight; state.mouth.targetOpacity = s.mouth.opacity;
+            }
+
+            // --- Automatic Behaviors ---
+            setInterval(() => {
+                 if (state.emotion !== 'thinking') {
+                    if (state.emotion === 'sad') {
+                         state.iris.targetX = (Math.random() - 0.5) * 8;
+                         state.iris.targetY = Math.random() * 8 + 4;
+                    } else {
+                        state.iris.targetX = (Math.random() - 0.5) * 16;
+                        state.iris.targetY = (Math.random() - 0.5) * 12;
+                    }
+                }
+            }, 3000);
+
+            setInterval(() => {
+                if (!state.blink.isBlinking) state.blink.isBlinking = true;
+            }, 4000);
+
+            // --- Event Listeners ---
+            document.getElementById('happy-btn').addEventListener('click', () => setEmotion('happy'));
+            document.getElementById('sad-btn').addEventListener('click', () => setEmotion('sad'));
+            document.getElementById('surprised-btn').addEventListener('click', () => setEmotion('surprised'));
+            document.getElementById('angry-btn').addEventListener('click', () => setEmotion('angry'));
+            document.getElementById('fear-btn').addEventListener('click', () => setEmotion('fear'));
+            document.getElementById('disgust-btn').addEventListener('click', () => setEmotion('disgust'));
+            document.getElementById('thinking-btn').addEventListener('click', () => setEmotion('thinking'));
+            document.getElementById('neutral-btn').addEventListener('click', () => setEmotion('neutral'));
+            
+            const posStep = 5;
+            const scaleStep = 0.1;
+
+            document.getElementById('eyes-up').addEventListener('click', () => state.features.eyes.y -= posStep);
+            document.getElementById('eyes-down').addEventListener('click', () => state.features.eyes.y += posStep);
+            document.getElementById('eyes-left').addEventListener('click', () => state.features.eyes.x -= posStep);
+            document.getElementById('eyes-right').addEventListener('click', () => state.features.eyes.x += posStep);
+            document.getElementById('eyes-size-inc').addEventListener('click', () => state.features.eyes.scale += scaleStep);
+            document.getElementById('eyes-size-dec').addEventListener('click', () => state.features.eyes.scale = Math.max(0.1, state.features.eyes.scale - scaleStep));
+            document.getElementById('spacing-inc').addEventListener('click', () => state.features.eyes.spacing += posStep);
+            document.getElementById('spacing-dec').addEventListener('click', () => state.features.eyes.spacing = Math.max(posStep, state.features.eyes.spacing - posStep));
+
+            document.getElementById('nose-up').addEventListener('click', () => state.features.nose.y -= posStep);
+            document.getElementById('nose-down').addEventListener('click', () => state.features.nose.y += posStep);
+            document.getElementById('nose-left').addEventListener('click', () => state.features.nose.x -= posStep);
+            document.getElementById('nose-right').addEventListener('click', () => state.features.nose.x += posStep);
+            document.getElementById('nose-size-inc').addEventListener('click', () => state.features.nose.scale += scaleStep);
+            document.getElementById('nose-size-dec').addEventListener('click', () => state.features.nose.scale = Math.max(0.1, state.features.nose.scale - scaleStep));
+
+            document.getElementById('mouth-up').addEventListener('click', () => state.features.mouth.y -= posStep);
+            document.getElementById('mouth-down').addEventListener('click', () => state.features.mouth.y += posStep);
+            document.getElementById('mouth-left').addEventListener('click', () => state.features.mouth.x -= posStep);
+            document.getElementById('mouth-right').addEventListener('click', () => state.features.mouth.x += posStep);
+            document.getElementById('mouth-size-inc').addEventListener('click', () => state.features.mouth.scale += scaleStep);
+            document.getElementById('mouth-size-dec').addEventListener('click', () => state.features.mouth.scale = Math.max(0.1, state.features.mouth.scale - scaleStep));
+
+            mainLoop();
+        });
+    </script>
+</body>
+</html>

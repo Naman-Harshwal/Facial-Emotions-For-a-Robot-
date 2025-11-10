@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Anime Face</title>
+    <style>
+        :root {
+            /* Exact colors sampled from the image */
+            --bg-color: #FFFFFF;
+            --line-color: #2c232b;
+            --iris-deep: #3a3a7b;
+            --iris-mid: #4d54a3;
+            --iris-light: #83a8e7;
+            --highlight: #FFFFFF;
+            --mouth-line: #d37a8a;
+            --mouth-fill: #f5c5d0;
+            --nose-color: rgba(44, 35, 43, 0.3);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--bg-color);
+        }
+
+        .face-container {
+            width: 400px;
+            height: 300px;
+        }
+        
+        .face-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="face-container">
+        <svg class="face-svg" viewBox="0 0 400 300">
+            <defs>
+                <!-- Accurate linear gradient for the iris, matching the image's top-to-bottom shading -->
+                <linearGradient id="irisGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:var(--iris-mid)" />
+                    <stop offset="30%" style="stop-color:var(--iris-deep)" />
+                    <stop offset="70%" style="stop-color:var(--iris-mid)" />
+                    <stop offset="100%" style="stop-color:var(--iris-light)" />
+                </linearGradient>
+            </defs>
+            
+            <!-- Left Eye Group -->
+            <g id="left-eye-group">
+                <defs>
+                    <!-- This path defines the exact almond shape of the eye -->
+                    <clipPath id="left-eye-clip">
+                        <path d="M 50,140 C 60,110 140,110 150,140 C 140,170 60,170 50,140 Z" />
+                    </clipPath>
+                </defs>
+                <!-- The iris is clipped by the eye shape -->
+                <g class="iris" clip-path="url(#left-eye-clip)">
+                    <ellipse cx="100" cy="140" rx="48" ry="52" fill="url(#irisGradient)"/>
+                    <!-- A subtle overlay to deepen the colors slightly -->
+                    <ellipse cx="100" cy="140" rx="48" ry="52" fill="var(--iris-deep)" opacity="0.2"/>
+                    <!-- The two distinct highlights, shaped and positioned accurately -->
+                    <ellipse cx="85" cy="125" rx="15" ry="20" fill="var(--highlight)" opacity="0.95"/>
+                    <ellipse cx="120" cy="160" rx="6" ry="8" fill="var(--highlight)" opacity="0.85"/>
+                </g>
+                <!-- The thick upper eyelash line -->
+                <path d="M 50,140 C 60,110 140,110 150,140 C 145,142 120,125 100,125 C 80,125 55,142 50,140 Z" fill="var(--line-color)"/>
+                <!-- The individual eyelash flicks, drawn as curved paths (Corrected Position) -->
+                <path d="M 52,138 Q 40,125 40,110" stroke="var(--line-color)" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <path d="M 62,120 Q 50,105 55,90" stroke="var(--line-color)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            </g>
+
+            <!-- Right Eye Group (A mirrored copy of the left for symmetry) -->
+            <g id="right-eye-group">
+                 <defs>
+                    <clipPath id="right-eye-clip">
+                        <path d="M 250,140 C 260,110 340,110 350,140 C 340,170 260,170 250,140 Z" />
+                    </clipPath>
+                </defs>
+                <g class="iris" clip-path="url(#right-eye-clip)">
+                    <ellipse cx="300" cy="140" rx="48" ry="52" fill="url(#irisGradient)"/>
+                    <ellipse cx="300" cy="140" rx="48" ry="52" fill="var(--iris-deep)" opacity="0.2"/>
+                    <ellipse cx="285" cy="125" rx="15" ry="20" fill="var(--highlight)" opacity="0.95"/>
+                    <ellipse cx="320" cy="160" rx="6" ry="8" fill="var(--highlight)" opacity="0.85"/>
+                </g>
+                <path d="M 250,140 C 260,110 340,110 350,140 C 345,142 320,125 300,125 C 280,125 255,142 250,140 Z" fill="var(--line-color)"/>
+                <path d="M 348,138 Q 360,125 360,110" stroke="var(--line-color)" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <path d="M 338,120 Q 350,105 345,90" stroke="var(--line-color)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            </g>
+
+            <!-- Eyebrows, drawn as simple, elegant curves -->
+            <path id="left-eyebrow" class="eyebrow" d="M 60,100 C 80,85 130,90 140,105" stroke="var(--line-color)" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path id="right-eyebrow" class="eyebrow" d="M 260,105 C 270,90 320,85 340,100" stroke="var(--line-color)" stroke-width="4" fill="none" stroke-linecap="round"/>
+            
+            <!-- Nose, a subtle dash to suggest the feature -->
+            <path d="M 200,185 L 202,195" stroke="var(--nose-color)" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+            <!-- Mouth, composed of three separate parts for accuracy -->
+            <g id="mouth-group" class="mouth-group">
+                <!-- The top line of the mouth -->
+                <path id="mouth-line" d="M 190,220 C 195,222 205,222 210,220" stroke="var(--mouth-line)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- The filled lower lip -->
+                <path id="mouth-fill" d="M 192,221 C 195,228 205,228 208,221 Z" fill="var(--mouth-fill)"/>
+                <!-- The small highlight on the lower lip -->
+                <circle cx="200" cy="225" r="1" fill="var(--highlight)" opacity="0.8"/>
+            </g>
+        </svg>
+    </div>
+
+</body>
+</html>

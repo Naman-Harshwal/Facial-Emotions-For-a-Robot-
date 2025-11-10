@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Face</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS variables for easy theming */
+        :root {
+            --bg-color: #1a1a2e;
+            --eye-white: #e0e0e0;
+            --iris-color-outer: #5c9ead;
+            --iris-color-inner: #87ceeb;
+            --pupil-color: #0f1c2e;
+            --highlight-color: #ffffff;
+            --mouth-color: #f0a3c2;
+            --mouth-inner-color: #d88da7;
+            --sparkle-color: #f0e68c;
+            --button-bg: #4a4e69;
+            --button-hover-bg: #6a6e99;
+            --text-color: #f2f2f2;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        .face-container {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .eye {
+            width: 100px;
+            height: 100px;
+            background-color: var(--eye-white);
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(135, 206, 235, 0.3);
+            transition: transform 0.3s ease, height 0.3s ease;
+        }
+
+        /* Eyelid for blinking animation */
+        .eye::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-color);
+            transform: translateY(-100%);
+            z-index: 10;
+        }
+
+        .eye.blinking::before {
+            animation: blink 0.4s ease-in-out;
+        }
+
+        @keyframes blink {
+            0% { transform: translateY(-100%); }
+            50% { transform: translateY(0%); }
+            100% { transform: translateY(-100%); }
+        }
+        
+        /* Squint effect for 'happy' emotion */
+        .eye.happy-squint {
+            height: 90px;
+            transform: translateY(5px);
+        }
+
+        /* Wide eye effect for 'surprised' emotion */
+        .eye.surprised-wide {
+            transform: scale(1.15);
+        }
+
+        .iris {
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+            background-color: var(--iris-color-outer);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.1s linear;
+        }
+
+        .iris::after {
+            content: '';
+            position: absolute;
+            width: 70%;
+            height: 70%;
+            background-color: var(--iris-color-inner);
+            border-radius: 50%;
+        }
+
+        .pupil {
+            position: relative;
+            width: 40%;
+            height: 40%;
+            background-color: var(--pupil-color);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .highlight {
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 25%;
+            height: 25%;
+            background-color: var(--highlight-color);
+            border-radius: 50%;
+            z-index: 3;
+            opacity: 0.9;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--sparkle-color);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: twinkle 2s infinite ease-in-out;
+            z-index: 5;
+        }
+
+        .sparkle.s1 { top: 10px; right: 10px; }
+        .sparkle.s2 { bottom: 15px; left: 15px; animation-delay: 0.5s; }
+        .sparkle.s3 { top: 10px; left: 10px; }
+        .sparkle.s4 { bottom: 15px; right: 15px; animation-delay: 0.7s; }
+
+        @keyframes twinkle {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        .mouth-container {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 50px;
+        }
+
+        .mouth {
+            width: 100%;
+            height: 100%;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Bouncy transition */
+        }
+        
+        .mouth-fill {
+            transition: d 0.3s ease;
+        }
+
+        .controls {
+            margin-top: 40px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .controls button {
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-color);
+            background-color: var(--button-bg);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls button:hover {
+            background-color: var(--button-hover-bg);
+        }
+        
+        .controls button:active {
+            transform: translateY(2px);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #9a9a9a;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="face-container">
+        <div class="eye left-eye">
+            <div class="iris">
+                <div class="pupil"></div>
+            </div>
+            <div class="highlight"></div>
+            <div class="sparkle s1"></div>
+            <div class="sparkle s2"></div>
+        </div>
+        <div class="eye right-eye">
+            <div class="iris">
+                <div class="pupil"></div>
+            </div>
+            <div class="highlight"></div>
+            <div class="sparkle s3"></div>
+            <div class="sparkle s4"></div>
+        </div>
+        <div class="mouth-container">
+            <svg class="mouth" viewBox="0 0 100 50">
+                <path class="mouth-fill" fill="var(--mouth-inner-color)" stroke="var(--mouth-color)" stroke-width="5" stroke-linecap="round" d="M 20 25 Q 50 50 80 25" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="happy-btn">Happy</button>
+        <button id="sad-btn">Sad</button>
+        <button id="surprised-btn">Surprised</button>
+        <button id="neutral-btn">Neutral</button>
+    </div>
+    
+    <p class="instructions">Move your mouse to see the eyes follow!</p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const irises = document.querySelectorAll('.iris');
+            const eyes = document.querySelectorAll('.eye');
+            const mouthPath = document.querySelector('.mouth-fill');
+
+            // --- Eye Movement ---
+            document.addEventListener('mousemove', (e) => {
+                irises.forEach(iris => {
+                    const rect = iris.getBoundingClientRect();
+                    const eyeX = rect.left + rect.width / 2;
+                    const eyeY = rect.top + rect.height / 2;
+                    
+                    const angle = Math.atan2(e.clientY - eyeY, e.clientX - eyeX);
+                    
+                    // The maximum distance the iris can move from the center
+                    const maxMove = 10; 
+                    
+                    const moveX = Math.cos(angle) * maxMove;
+                    const moveY = Math.sin(angle) * maxMove;
+
+                    iris.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                });
+            });
+
+            // --- Automatic Blinking ---
+            function triggerBlink() {
+                eyes.forEach(eye => {
+                    eye.classList.add('blinking');
+                    // Remove class after animation finishes
+                    setTimeout(() => {
+                        eye.classList.remove('blinking');
+                    }, 400);
+                });
+                
+                // Schedule the next blink at a random interval
+                const randomInterval = Math.random() * 4000 + 2000; // between 2 and 6 seconds
+                setTimeout(triggerBlink, randomInterval);
+            }
+            // Start the first blink
+            setTimeout(triggerBlink, 2000);
+
+
+            // --- Emotion Control ---
+            const mouthShapes = {
+                happy: 'M 20 25 Q 50 50 80 25',
+                sad: 'M 20 35 Q 50 10 80 35',
+                surprised: 'M 35 15 Q 50 40 65 15 Z', // A circle-like shape
+                neutral: 'M 20 30 L 80 30' // A straight line
+            };
+
+            const setEmotion = (emotion) => {
+                mouthPath.setAttribute('d', mouthShapes[emotion]);
+
+                // Reset all eye emotion classes
+                eyes.forEach(eye => {
+                    eye.classList.remove('happy-squint', 'surprised-wide');
+                });
+                
+                // Apply specific eye styles for emotions
+                if (emotion === 'happy') {
+                    eyes.forEach(eye => eye.classList.add('happy-squint'));
+                } else if (emotion === 'surprised') {
+                    eyes.forEach(eye => eye.classList.add('surprised-wide'));
+                }
+            };
+
+            document.getElementById('happy-btn').addEventListener('click', () => setEmotion('happy'));
+            document.getElementById('sad-btn').addEventListener('click', () => setEmotion('sad'));
+            document.getElementById('surprised-btn').addEventListener('click', () => setEmotion('surprised'));
+            document.getElementById('neutral-btn').addEventListener('click', () => setEmotion('neutral'));
+
+            // Set initial emotion
+            setEmotion('happy');
+        });
+    </script>
+</body>
+</html>
